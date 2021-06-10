@@ -19,6 +19,8 @@ class _HomePageState extends State<HomePage> {
 
   AudioPlayer audioPlayer = AudioPlayer();
 
+  statutPlayer myStatut = statutPlayer.stop;
+
   @override
   void initState() {
     super.initState();
@@ -43,14 +45,23 @@ class _HomePageState extends State<HomePage> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-              Expanded(child: 
-                  Container(
-                    child: Image.asset(mySong[index].image , fit: BoxFit.cover)
+            Expanded(
+              child: Container(
+                  child: Image.asset(mySong[index].image, fit: BoxFit.cover)),
+            ),
+            Text(mySong[index].name, style: GoogleFonts.roboto(fontSize: 40)),
+            Text(mySong[index].music,
+                style: GoogleFonts.alexBrush(fontSize: 30)),
+            Container(
+              padding: EdgeInsets.only(left: 10, right: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(durationFormat(position)),
+                  Text(durationFormat(duree)),
+                ],
               ),
             ),
-       
-            Text(mySong[index].name, style: GoogleFonts.roboto(fontSize: 40)),
-            Text(mySong[index].music, style: GoogleFonts.alexBrush(fontSize: 30)),
             Slider(
               inactiveColor: Colors.red,
               activeColor: Colors.black,
@@ -71,18 +82,19 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                      onPressed: () {
-                        fastRewind();
-                      },
-                      icon: Icon(Icons.fast_rewind),
-                      color: Colors.white,
-                      ),
+                    onPressed: () {
+                      fastRewind();
+                    },
+                    icon: Icon(Icons.fast_rewind),
+                    color: Colors.white,
+                  ),
                   (isPlay)
                       ? IconButton(
                           onPressed: () {
                             playerStatut(statutPlayer.lecture);
                             setState(() {
                               isPlay = !isPlay;
+                              myStatut = statutPlayer.pause;
                             });
                           },
                           icon: Icon(Icons.play_arrow),
@@ -102,17 +114,15 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                         ),
                   IconButton(
-                      onPressed: () {
-                        fastForward();
-                      },
-                      icon: Icon(Icons.fast_forward),
-                      color: Colors.white,
-                      ),
-                      
+                    onPressed: () {
+                      fastForward();
+                    },
+                    icon: Icon(Icons.fast_forward),
+                    color: Colors.white,
+                  ),
                 ],
               ),
             ),
-          
           ],
         ));
   }
@@ -120,17 +130,26 @@ class _HomePageState extends State<HomePage> {
   //fonctions :
 
   Future play() async {
-    await audioPlayer.play(mySong[index].urlSon);
+    if (position != Duration(seconds: 0)) {
+      await audioPlayer.resume();
+    } else {
+      await audioPlayer.play(mySong[index].urlSon);
+    }
   }
 
   Future pause() async {
     await audioPlayer.pause();
+
+    setState(() {
+      myStatut = statutPlayer.lecture;
+    });
   }
 
   void fastForward() {
     if (index < mySong.length - 1) {
       setState(() {
         index++;
+        position = Duration(seconds: 0);
       });
     } else {
       setState(() {
@@ -141,40 +160,32 @@ class _HomePageState extends State<HomePage> {
     audioPlayer.stop();
     configMyPlayer();
     play();
-
-    // Duration moveBack = Duration(seconds: 5);
-    // setState(() {
-    //   position = moveBack;
-    // });
-
-    // await audioPlayer.seek(position);
   }
 
   void fastRewind() {
     if (position > Duration(seconds: 5)) {
       audioPlayer.seek(Duration(seconds: 0));
-
     } else {
       if (index == 0) {
         setState(() {
-          index = mySong.length - 1; 
+          index = mySong.length - 1;
+          position = Duration(seconds: 0);
         });
       } else {
         setState(() {
-          index --;
+          index--;
         });
       }
     }
 
     audioPlayer.stop();
     play();
-
-
   }
 
   void configMyPlayer() {
     StreamSubscription positionSubPlay;
-    //StreamSubscription positionSubStop;
+
+    myStatut = statutPlayer.stop;
 
     positionSubPlay = audioPlayer.onAudioPositionChanged.listen((event) {
       setState(() {
@@ -182,14 +193,12 @@ class _HomePageState extends State<HomePage> {
       });
     });
 
-    // positionSubStop = audioPlayer.onAudioPositionChanged.listen((state) {
-
-    //   if(state == statutPlayer.lecture){
-
-    //       duree = await  audioPlayer.
-    //   }
-
-    // });
+    StreamSubscription positionSubStop;
+    positionSubStop = audioPlayer.onDurationChanged.listen((event) {
+      setState(() {
+        duree = event; 
+      });
+    });
   }
 
   void playerStatut(statutPlayer statut) {
@@ -209,6 +218,10 @@ class _HomePageState extends State<HomePage> {
 
       default:
     }
+  }
+
+  String durationFormat(Duration d) {
+    return d.toString().split(".").first;
   }
 }
 
