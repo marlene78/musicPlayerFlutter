@@ -154,6 +154,7 @@ class _HomePageState extends State<HomePage> {
     } else {
       setState(() {
         index = 0;
+        position = Duration(seconds: 0);
       });
     }
 
@@ -174,6 +175,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         setState(() {
           index--;
+          position = Duration(seconds: 0);
         });
       }
     }
