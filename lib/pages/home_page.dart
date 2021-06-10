@@ -26,9 +26,9 @@ class _HomePageState extends State<HomePage> {
     configMyPlayer();
 
     mySong = [
-      Music("artiste 2", "music 2", "assets/images/image-1.jpg",
+      Music("Artiste 1", "Music 1", "assets/images/image-1.jpg",
           "https://noisyliens.fr/wp-content/uploads/2021/06/audiohub__4066141002255_zombie-invasion-2015__testversion.mp3"),
-      Music("artiste 3", "music 3", "assets/images/image-2.jpg",
+      Music("Artiste 2", "Music 2", "assets/images/image-2.jpg",
           "https://noisyliens.fr/wp-content/uploads/2021/06/audiohub__4066141002828_all-the-summer-girls_276__testversion.mp3")
     ];
   }
@@ -41,53 +41,16 @@ class _HomePageState extends State<HomePage> {
                 style: const TextStyle(color: Colors.white)),
             backgroundColor: Colors.black),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Center(
-              child: Container(child: Image.asset(mySong[index].image)),
-            ),
-            Text(mySong[index].name, style: GoogleFonts.alexBrush()),
-            Text(mySong[index].music, style: GoogleFonts.roboto()),
-            Container(
-              color: Colors.black54,
-              height: 50,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                      onPressed: () {
-                        fastRewind();
-                      },
-                      icon: Icon(Icons.fast_rewind)),
-                  (isPlay)
-                      ? IconButton(
-                          onPressed: () {
-                            playerStatut(statutPlayer.lecture);
-                            setState(() {
-                              isPlay = !isPlay;
-                            });
-                          },
-                          icon: Icon(Icons.play_arrow),
-                          iconSize: 35,
-                        )
-                      : IconButton(
-                          onPressed: () {
-                            playerStatut(statutPlayer.pause);
-
-                            setState(() {
-                              isPlay = !isPlay;
-                            });
-                          },
-                          icon: Icon(Icons.pause),
-                          iconSize: 35,
-                        ),
-                  IconButton(
-                      onPressed: () {
-                        fastForward();
-                      },
-                      icon: Icon(Icons.fast_forward))
-                ],
+              Expanded(child: 
+                  Container(
+                    child: Image.asset(mySong[index].image , fit: BoxFit.cover)
               ),
             ),
+       
+            Text(mySong[index].name, style: GoogleFonts.roboto(fontSize: 40)),
+            Text(mySong[index].music, style: GoogleFonts.alexBrush(fontSize: 30)),
             Slider(
               inactiveColor: Colors.red,
               activeColor: Colors.black,
@@ -100,7 +63,56 @@ class _HomePageState extends State<HomePage> {
                 });
               },
               value: position.inSeconds.toDouble(),
-            )
+            ),
+            Container(
+              color: Colors.black,
+              height: 80,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                      onPressed: () {
+                        fastRewind();
+                      },
+                      icon: Icon(Icons.fast_rewind),
+                      color: Colors.white,
+                      ),
+                  (isPlay)
+                      ? IconButton(
+                          onPressed: () {
+                            playerStatut(statutPlayer.lecture);
+                            setState(() {
+                              isPlay = !isPlay;
+                            });
+                          },
+                          icon: Icon(Icons.play_arrow),
+                          iconSize: 50,
+                          color: Colors.white,
+                        )
+                      : IconButton(
+                          onPressed: () {
+                            playerStatut(statutPlayer.pause);
+
+                            setState(() {
+                              isPlay = !isPlay;
+                            });
+                          },
+                          icon: Icon(Icons.pause),
+                          iconSize: 50,
+                          color: Colors.white,
+                        ),
+                  IconButton(
+                      onPressed: () {
+                        fastForward();
+                      },
+                      icon: Icon(Icons.fast_forward),
+                      color: Colors.white,
+                      ),
+                      
+                ],
+              ),
+            ),
+          
           ],
         ));
   }
@@ -157,7 +169,7 @@ class _HomePageState extends State<HomePage> {
     audioPlayer.stop();
     play();
 
-    
+
   }
 
   void configMyPlayer() {
